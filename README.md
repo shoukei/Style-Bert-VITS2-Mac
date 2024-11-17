@@ -1,11 +1,15 @@
+Fork of [tokyohandsome/Style-Bert-VITS2-Mac](https://github.com/tokyohandsome/Style-Bert-VITS2-Mac)
+
+intel_cpuブランチはIntel Macで学習ができます。
+
 # Style-Bert-VITS2-Mac
 
-Style-Bert-VITS2 を macOS で動くようにする repo です。  
-Style-Bert-VITS2 Ver 2.6.1 をフォークして開発を進めます。  
-さしあたって、学習が CPU だけで行えるようになりました。当然遅いですが、これまで Mac では学習する手立てが無かったので一歩前進です。  
-試してないですが、Windows や Linux で NVIDIA GPU が無い環境でも実行できるかと。  
+Style-Bert-VITS2 を macOS で動くようにする repo です。
+Style-Bert-VITS2 Ver 2.6.1 をフォークして開発を進めます。
+さしあたって、学習が CPU だけで行えるようになりました。当然遅いですが、これまで Mac では学習する手立てが無かったので一歩前進です。
+試してないですが、Windows や Linux で NVIDIA GPU が無い環境でも実行できるかと。
 
-とりあえずある程度を手動でやってもらうこととして、CPU だけで学習させてモデル一覧に追加されるまでの手順を以下にまとめます。  
+とりあえずある程度を手動でやってもらうこととして、CPU だけで学習させてモデル一覧に追加されるまでの手順を以下にまとめます。
 
 ## インストール
 ```
@@ -19,25 +23,25 @@ python initialize.py
 ```
 
 ## Web UI 起動
-~`app.py` は CUDA/MPS/CPU が環境に応じて選択されるようにしました。 Apple Silicon Mac も音声合成は GPU (MPS) で実行されます。~  
-MPS で音声合成すると声がかすれる事象が確認されたため、CPU を使用するように変更しました (ver. 1.0.4)。  
+~`app.py` は CUDA/MPS/CPU が環境に応じて選択されるようにしました。 Apple Silicon Mac も音声合成は GPU (MPS) で実行されます。~
+MPS で音声合成すると声がかすれる事象が確認されたため、CPU を使用するように変更しました (ver. 1.0.4)。
 ```
 python app.py
 ```
-起動までに数分かかりますが自動的にブラウザで開くはずです。辛抱強くお待ちください。  
+起動までに数分かかりますが自動的にブラウザで開くはずです。辛抱強くお待ちください。
 
 ## データセット作成
-ここはすみませんがとりあえず手作業でお願いします。  
+ここはすみませんがとりあえず手作業でお願いします。
 1. 2-12秒程度の音声ファイルを準備 (wav や mp3 等)
 2. モデル名 (フォルダ名) を決める (以下、`ModelName` として進めます)
 3. Data/ModelName/raw フォルダを作る `mkdir Data/ModelName/raw`
 4. Data/ModelName/raw フォルダに音声ファイルを格納
-4. Data/ModelName/esd.list というテキストファイルを作り、音声ファイル名と、文字起こししたテキストを記入  
+4. Data/ModelName/esd.list というテキストファイルを作り、音声ファイル名と、文字起こししたテキストを記入
 例:
 ```esd.list
 audio1.wav|ModelName|JP|こんにちは、おげんきですか？
 ```
-※音声ファイルの拡張子は、別のフォーマットであっても必ず '**.wav**' とする  
+※音声ファイルの拡張子は、別のフォーマットであっても必ず '**.wav**' とする
 
 音声ファイルが一つの場合のファイル構成:
 ```
@@ -81,23 +85,23 @@ Data/ModelName
 ```
 python train_ms_jp_extra_cpu.py --config Data/ModelName/config.json --model Data/ModelName
 ```
-CPU を使った学習が開始します。  
-ログに INFO や WARNING は出ると思いますが、最終的にエラーも無く Epoch プログレスバーが 100% になり、プロンプトが返ってくればおそらく成功です。  
-参考まで、M2 Max 12 core CPU で、6秒の単一の音声ファイルを学習するのに、5分10秒ほどかかります。  
+CPU を使った学習が開始します。
+ログに INFO や WARNING は出ると思いますが、最終的にエラーも無く Epoch プログレスバーが 100% になり、プロンプトが返ってくればおそらく成功です。
+参考まで、M2 Max 12 core CPU で、6秒の単一の音声ファイルを学習するのに、5分10秒ほどかかります。
 
-これで完成しているはずなので、Web UI に戻り、モデル一覧の下の [ 更新 ] ボタンをクリックします。  
-モデル一覧に自分が作ったモデルがあると思います。  
-選択して [ ロード ] ボタンをクリックすると、音声合成に使用できます。  
+これで完成しているはずなので、Web UI に戻り、モデル一覧の下の [ 更新 ] ボタンをクリックします。
+モデル一覧に自分が作ったモデルがあると思います。
+選択して [ ロード ] ボタンをクリックすると、音声合成に使用できます。
 
-2024.10.12 追加:  
+2024.10.12 追加:
 ## API サーバにしゃべらせる
-Dify 等の AI ツールから API で音声合成させ、そのまま API サーバにしゃべらせる乱暴な処理を元のスクリプトに追加しました。  
-すでに環境構築済みであれば、pydub をインストールしてください: `pip install pydub`  
-その後、この repo にある [server_speech_fastapi.py](https://github.com/tokyohandsome/Style-Bert-VITS2-Mac/blob/master/server_speech_fastapi.py) を実行します。  
-`python server_speech_fastapi.py`  
-オリジナルの API サーバと同じ使い方ですが、テキストとモデル名が POST されると、音声合成してサーバが発声します。クライアントには発声完了後にテキストを返します。  
+Dify 等の AI ツールから API で音声合成させ、そのまま API サーバにしゃべらせる乱暴な処理を元のスクリプトに追加しました。
+すでに環境構築済みであれば、pydub をインストールしてください: `pip install pydub`
+その後、この repo にある [server_speech_fastapi.py](https://github.com/tokyohandsome/Style-Bert-VITS2-Mac/blob/master/server_speech_fastapi.py) を実行します。
+`python server_speech_fastapi.py`
+オリジナルの API サーバと同じ使い方ですが、テキストとモデル名が POST されると、音声合成してサーバが発声します。クライアントには発声完了後にテキストを返します。
 
-以下は全てオリジナルの repo の内容になります。使い方の詳細はこちらをご参照ください。  
+以下は全てオリジナルの repo の内容になります。使い方の詳細はこちらをご参照ください。
 
 ---
 
